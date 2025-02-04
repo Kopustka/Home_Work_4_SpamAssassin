@@ -1,3 +1,4 @@
+# Import necessary modules from the 'moduls' package
 from moduls import importing
 from moduls import (get_datas,
                     balancing,
@@ -16,70 +17,73 @@ from moduls import (loading,
                     )
 
 def main():
-    # ссылка в kaggle и путь установки
-    # У меня почему-то даже без папки работает не знаю почему
+    # Kaggle dataset name and download path
+    # For some reason, it works even without specifying a folder
     dataset_name = 'beatoa/spamassassin-public-corpus'
     download_path = '../data/'
 
-    # путь до датасетов
+    # Paths to spam and ham datasets
     spam_path = '../data/spam_2/spam_2'
     ham_path = '../data/easy_ham/easy_ham'
-    # Можно и '../data/hard_ham/hard_ham' но нужно подбирать настройки
-
+    # '../data/hard_ham/hard_ham' can also be used, but parameters need adjustment
 
     '''Importing'''
     print("------Importing------", end ='\n')
 
-    importing(dataset_name,download_path)
-    print(f"Датасет скачан в: {download_path}")
-
+    # Download the dataset from Kaggle
+    importing(dataset_name, download_path)
+    print(f"Dataset downloaded to: {download_path}")
 
     '''Preprocessing'''
     print("----Preprocessing----", end ='\n')
 
+    # Get the list of spam and ham files from the specified directories
     spam_files, ham_files = get_datas(spam_path, ham_path)
-    print(f"Спам-файлов: {len(spam_files)}")
-    print(f"Хам-файлов: {len(ham_files)}")
+    print(f"Spam files: {len(spam_files)}")
+    print(f"Ham files: {len(ham_files)}")
 
-    # balancing
+    # Balance the dataset by randomly removing excess spam or ham files
     spam_files, ham_files = balancing(spam_files, ham_files)
-    print(f"После фильтрации: Спам: {len(spam_files)}, Хам: {len(ham_files)}")
-    print(f"Оставшиеся хам-файлы: {len(ham_files)}")
-    print(f"Оставшиеся спам-файлы: {len(spam_files)}")
+    print(f"After balancing: Spam: {len(spam_files)}, Ham: {len(ham_files)}")
+    print(f"Remaining ham files: {len(ham_files)}")
+    print(f"Remaining spam files: {len(spam_files)}", end='\n')
 
-    # Пример чтения первых писем
+    # Read a sample email from spam and ham datasets
     sample_spam = read_email(spam_files[0])
     sample_ham = read_email(ham_files[0])
-    print(sample_spam[:500])  # Первые 500 символов письма
+    print('MAIL EXAMPLE:')
+    print(sample_spam[:500], end='\n')  # Display the first 500 characters of a spam email
 
-    # настройка векторизатора
-    vectorizer, corpus, X = lemmatization_and_parsing(sample_spam,spam_files,ham_files)
+    # Preprocess the dataset (lemmatization, tokenization, and text parsing)
+    vectorizer, corpus, X = lemmatization_and_parsing(sample_spam, spam_files, ham_files)
 
-
-    # Preview
+    # Create labels (1 for spam, 0 for ham) for classification
     y = creating_marks(spam_files, ham_files)
 
-    # Vectorizing
-    # Сохраняем векторайзер и векторизованные данные
+    # Vectorize the dataset and save the transformed data for later use
     vectorizing(vectorizer, y, X)
 
+    '''Training'''
+    print("------Training------", end ='\n')
 
-    '''Traning'''
-    print("------Traning------", end ='\n')
-
-    # загрузка из векторов
+    # Load the saved vectorized data
     vectorizer, X, y = loading()
-    # Получение тестовыой и тренировочной выборки
-    X_train, X_test, y_train, y_test = preview(X,y)
-    # предсказание, можно использовать:
-    #                     randomforest,
-    #                     gradientbosting,
-    #                     svcclass(SVC),
-    #                     extr_trees,
-    #                     catboost,
-    y_pred = svcclass(X_train, X_test, y_train)
-    # Вывод результатов
+
+    # Split the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = preview(X, y)
+
+    # Train a classification model and make predictions
+    # Available models:
+    #     randomforest        -> Random Forest Classifier
+    #     gradientbosting     -> Gradient Boosting Classifier
+    #     svcclass(SVC)       -> Support Vector Machine (SVM)
+    #     extr_trees          -> Extra Trees Classifier
+    #     catboost            -> CatBoost Classifier
+    y_pred = gradientbosting(X_train, X_test, y_train)  # Using Gradient Boosting
+
+    # Evaluate the model performance with accuracy, precision, recall, and confusion matrix
     quality_assessment(y_test, y_pred)
 
+# Ensure the script runs only when executed directly
 if __name__ == "__main__":
     main()
