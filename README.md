@@ -93,7 +93,7 @@ Precision, Recall, F1-score
 Confusion Matrix
 📦 Dependencies (requirements.txt)
 If you need to manually install libraries, add to requirements.txt:
----
+
 beautifulsoup4==4.13.1
 bleach==6.2.0
 bs4==0.0.2
@@ -136,7 +136,7 @@ typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0
 webencodings==0.5.1
----
+
 
 ✨ Done! Now you can run and improve the spam classifier! 🚀
 If you have any questions - write! 😊
